@@ -1,0 +1,6 @@
+{
+  "name": "AI Video Engine",
+  "description": "A professional AI video generation platform with robust queue processing and FFmpeg support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

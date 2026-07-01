@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ai-video-generator
+    env: docker
+    plan: starter
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000

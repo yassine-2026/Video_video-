@@ -1,11 +1,49 @@
-<div align="center">
+# AI Video Generator
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A professional full-stack platform for AI video generation, designed for scalability and deployment on Render.
 
-  <h1>Built with AI Studio</h2>
+## Tech Stack
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+**Frontend:**
+- React 19 + Vite
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- React Query
+- React Router v7
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+**Backend:**
+- Node.js + Express
+- TypeScript
+- Axios
+- FFmpeg Integration Ready
+- Pino Logger
+- In-Memory Queue (Replaceable with BullMQ/Redis)
 
-</div>
+## Quick Start
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the development server:
+```bash
+npm run dev
+```
+
+3. Build for production:
+```bash
+npm run build
+npm start
+```
+
+## Architecture
+
+- `src/` - React Frontend Application
+- `server/` - Node.js Backend API
+- `temp/` - Temporary storage for processing uploads and videos (cleared automatically based on retention policy)
+
+## Deployment
+
+This repository includes a `Dockerfile` and `render.yaml` for zero-configuration deployment to Render.
