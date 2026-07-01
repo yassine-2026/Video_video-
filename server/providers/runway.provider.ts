@@ -33,7 +33,7 @@ export class RunwayProvider implements AIProvider {
         }
       }
       
-      const response = await axios.post('https://api.dev.runwayml.com/v1/image_to_video', payload, { headers: this.headers });
+      const response = await axios.post('https://api.runwayml.com/v1/image_to_video', payload, { headers: this.headers });
       
       return {
         id: response.data.id,
@@ -41,14 +41,25 @@ export class RunwayProvider implements AIProvider {
         provider: this.name
       };
     } catch (error: any) {
-      logger.error({ err: error.response?.data || error.message }, 'Runway API Error');
-      throw new Error(`Runway generation failed: ${error.response?.data?.error?.message || error.response?.data?.message || error.message}`);
+      const status = error.response?.status;
+      const data = error.response?.data;
+      const message = data?.error?.message || data?.message || error.message;
+      
+      logger.error({ 
+        provider: this.name,
+        endpoint: 'https://api.runwayml.com/v1/image_to_video',
+        statusCode: status,
+        errorMessage: message,
+        rawResponse: data
+      }, `[Provider: ${this.name}] Generation API Error: ${message}`);
+      
+      throw new Error(`${this.name} generation failed: ${message}`);
     }
   }
 
   async checkStatus(jobId: string): Promise<VideoGenerationResult> {
     try {
-      const response = await axios.get(`https://api.dev.runwayml.com/v1/tasks/${jobId}`, { headers: this.headers });
+      const response = await axios.get(`https://api.runwayml.com/v1/tasks/${jobId}`, { headers: this.headers });
       const data = response.data;
       
       let status: 'pending' | 'processing' | 'completed' | 'failed' = 'processing';
@@ -70,7 +81,7 @@ export class RunwayProvider implements AIProvider {
 
   async cancelJob(jobId: string): Promise<void> {
     try {
-       await axios.post(`https://api.dev.runwayml.com/v1/tasks/${jobId}/cancel`, {}, { headers: this.headers });
+       await axios.post(`https://api.runwayml.com/v1/tasks/${jobId}/cancel`, {}, { headers: this.headers });
     } catch (error: any) {
        logger.warn(`Could not cancel Runway job ${jobId}: ${error.message}`);
     }

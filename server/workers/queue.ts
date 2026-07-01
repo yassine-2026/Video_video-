@@ -58,11 +58,11 @@ class InMemoryQueue {
     }
   }
 
-  private async tryProvider(job: Job, providerIndex: number): Promise<void> {
+  private async tryProvider(job: Job, providerIndex: number, lastError?: string): Promise<void> {
     if (providerIndex >= providers.length) {
       job.status = 'failed';
-      job.error = 'All providers failed or are unavailable';
-      logger.error(`Job ${job.id} failed: No more providers to try`);
+      job.error = lastError || 'All providers failed or are unavailable';
+      logger.error(`Job ${job.id} failed: No more providers to try. Last error: ${job.error}`);
       this.cleanupTempFiles(job);
       return;
     }
@@ -144,21 +144,21 @@ class InMemoryQueue {
             clearInterval(pollInterval);
             logger.warn(`[Provider: ${provider.name}] Job ${job.id} FAILED during processing: ${status.error}`);
             // Fallback to next provider
-            await this.tryProvider(job, providerIndex + 1);
+            await this.tryProvider(job, providerIndex + 1, status.error);
           } else {
             job.progress = Math.min(90, job.progress + 5);
           }
         } catch (error: any) {
           clearInterval(pollInterval);
           logger.warn(`[Provider: ${provider.name}] Job ${job.id} polling error: ${error.message}`);
-          await this.tryProvider(job, providerIndex + 1);
+          await this.tryProvider(job, providerIndex + 1, error.message);
         }
       }, 2000);
 
     } catch (error: any) {
       logger.warn(`[Provider: ${provider.name}] Failed to start generation: ${error.message}`);
       // Fallback to next provider immediately
-      await this.tryProvider(job, providerIndex + 1);
+      await this.tryProvider(job, providerIndex + 1, error.message);
     }
   }
 

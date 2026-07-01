@@ -39,8 +39,19 @@ export class LumaProvider implements AIProvider {
         provider: this.name
       };
     } catch (error: any) {
-      logger.error({ err: error.response?.data || error.message }, 'Luma API Error');
-      throw new Error(`Luma generation failed: ${error.response?.data?.message || error.message}`);
+      const status = error.response?.status;
+      const data = error.response?.data;
+      const message = data?.message || error.message;
+      
+      logger.error({ 
+        provider: this.name,
+        endpoint: 'https://api.lumalabs.ai/dream-machine/v1/generations',
+        statusCode: status,
+        errorMessage: message,
+        rawResponse: data
+      }, `[Provider: ${this.name}] Generation API Error: ${message}`);
+      
+      throw new Error(`${this.name} generation failed: ${message}`);
     }
   }
 
