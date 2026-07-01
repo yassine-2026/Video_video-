@@ -23,7 +23,6 @@ RUN npm ci --only=production
 
 # Copy build artifacts
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/temp ./temp
 
 # Create temp dir if it doesn't exist
 RUN mkdir -p temp

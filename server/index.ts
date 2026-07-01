@@ -10,8 +10,12 @@ import { errorHandler } from './middlewares/errorHandler';
 import videoRoutes from './routes/videoRoutes';
 import { createServer as createViteServer } from 'vite';
 import { startPeriodicCleanup } from './workers/cleanup';
+import fs from 'fs';
 
 async function startServer() {
+  // Ensure temp directory exists
+  fs.mkdirSync(path.resolve(process.cwd(), 'temp'), { recursive: true });
+
   const app = express();
 
   // Middleware
