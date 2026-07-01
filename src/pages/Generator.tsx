@@ -221,8 +221,9 @@ export default function Generator() {
                   onChange={(e) => setQuality(e.target.value)}
                   className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm appearance-none outline-none focus:border-indigo-500/50"
                 >
-                  <option value="standard">Standard (1080p)</option>
-                  <option value="high">High (4K)</option>
+                  <option value="720p">720p (Fast)</option>
+                  <option value="1080p">1080p (Standard)</option>
+                  <option value="max">Max Resolution</option>
                 </select>
               </div>
               <div className="space-y-2">
@@ -233,9 +234,9 @@ export default function Generator() {
                   className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-sm appearance-none outline-none focus:border-indigo-500/50"
                 >
                   <option value="cinematic">Cinematic</option>
+                  <option value="realistic">Realistic</option>
                   <option value="anime">Anime</option>
-                  <option value="3d_render">3D Render</option>
-                  <option value="photorealistic">Photorealistic</option>
+                  <option value="3d">3D Render</option>
                 </select>
               </div>
               <div className="space-y-2">
@@ -308,6 +309,7 @@ export default function Generator() {
                 <div className="w-full h-full relative group">
                   <video 
                     src={jobStatus.result.videoUrl} 
+                    poster={jobStatus.result.thumbnailUrl}
                     controls 
                     autoPlay 
                     loop 
@@ -395,15 +397,25 @@ export default function Generator() {
                   className="flex space-x-4"
                 >
                   <button 
+                    onClick={() => {
+                      const settings = `Prompt: ${prompt}\nDuration: ${duration}s\nQuality: ${quality}\nAspect Ratio: ${aspectRatio}\nStyle: ${style}`;
+                      navigator.clipboard.writeText(settings);
+                      alert('Settings copied to clipboard!');
+                    }}
+                    className="flex-1 bg-white/10 hover:bg-white/15 border border-white/5 py-4 rounded-xl font-medium flex items-center justify-center transition-all text-white text-sm"
+                  >
+                    Copy Settings
+                  </button>
+                  <button 
                     onClick={handleGenerate}
-                    className="flex-1 bg-white/10 hover:bg-white/15 border border-white/5 py-4 rounded-xl font-medium flex items-center justify-center transition-all text-white"
+                    className="flex-1 bg-white/10 hover:bg-white/15 border border-white/5 py-4 rounded-xl font-medium flex items-center justify-center transition-all text-white text-sm"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Regenerate
                   </button>
                   <button 
                     onClick={resetForm}
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 py-4 rounded-xl font-medium flex items-center justify-center transition-all text-white"
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 py-4 rounded-xl font-medium flex items-center justify-center transition-all text-white text-sm"
                   >
                     <Video className="h-4 w-4 mr-2" />
                     Create New

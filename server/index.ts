@@ -3,11 +3,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import path from 'path';
+import rateLimit from 'express-rate-limit';
 import { env } from './config/env';
 import { logger } from './config/logger';
 import { errorHandler } from './middlewares/errorHandler';
 import videoRoutes from './routes/videoRoutes';
 import { createServer as createViteServer } from 'vite';
+import { startPeriodicCleanup } from './workers/cleanup';
 
 async function startServer() {
   const app = express();
@@ -22,6 +24,18 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  // Rate Limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, message: 'Too many requests, please try again later.' }
+  });
+  
+  // Apply the rate limiting middleware to API calls only
+  app.use('/api', limiter);
+
   // Serve temp directory for uploaded images (and potentially downloaded videos in a real app)
   app.use('/temp', express.static(path.resolve(process.cwd(), 'temp')));
 
@@ -31,6 +45,9 @@ async function startServer() {
   });
 
   app.use('/api/videos', videoRoutes);
+
+  // Start background workers
+  startPeriodicCleanup();
 
   // Vite Middleware (for development) & Static Serving (for production)
   if (env.NODE_ENV !== 'production') {
